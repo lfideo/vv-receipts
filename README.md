@@ -1,6 +1,6 @@
 # vv-receipts
-Анализ расходов на продукты на основе чеков ВкусВилл <br></br>
-Арзитектура пайплайна:
+Product expense analysis using Vkusvill receipts <br></br>
+Pipeline architecture:
 ```
   A[Gmail Inbox] --> B[Google Apps Script: Email Parser]
   B --> C[Google Sheet: Raw Emails]
@@ -10,45 +10,45 @@
   F --> G[Final Table: Ready for Analysis]
 ```
 
-1. Gmail-парсинг (Google Apps Script)
+1. Gmail-parsing (Google Apps Script)
 
-- Скрипт `get_emails.gs` ищет письма от ВкусВилла и сохраняет их тело, тему, дату и другие данные в Google Таблицу.
+- The script `get_emails.gs` looks for Vkusvill receipts in my inbox and saves data to Google Sheets.
 
-Функции:
+Appscript functions:
 
-- getGmailEmails() — поиск писем по фильтру
+- getGmailEmails() — searches emails based on filters
 
-- extractDetails() — парсинг содержимого письма и запись в таблицу
+- extractDetails() — parses email contents and writes data to Google Sheets table
 
-- onOpen() — добавление кнопки в интерфейс Google Таблиц
+- onOpen() — this adds a button to Googgle Sheets interface
 
-2. Обработка данных (Python)
+2. Data processing (Python)
 
-* Скрипт на Python `vv_parser.py` подключается к Google Таблице, извлекает тело писем и обрабатывает его с помощью регулярных выражений для извлечения:
+* `vv_parser.py` connects to Google Sheets through `gspread` library, extracts email contents and processes data with the help of regex:
 
-- Названия товара
+- product
 
-- Количества
+- quantity
 
-- Цены за единицу
+- price
 
-- Итоговой суммы
+- total_sum
 
-Используются два основных паттерна (numeric_pattern и item_pattern), которые покрывают разные форматы чеков.
+Two main patterns are used (numeric_pattern and item_pattern), which cover different receipt formats.
 
-3. Категоризация товаров
+3. Product categorisation
 
-* После парсинга итоговый DataFrame экспортируется в Excel. Вручную добавляются две колонки:
+* The dataframe is exported to excel. I manually added two new columns:
 
-- category — основная категория продукта
+- category — main product category (i.e. food or home)
 
-- subcategory — подкатегория
+- subcategory — for instance, if the category is `food`, then it breaks down to `milk and dairy products`, etc
 
-Этот шаг выполняется один раз. Обновления нужны только при появлении новых товаров.
+This step is not required often. updates are required when there are new products.
 
-4. Финальная таблица
+4. Final table
 
-Итоговый DataFrame содержит такие поля:
+dataframe with the following columns:
 
 - date
 
@@ -66,7 +66,7 @@
 
 - subcategory
 
-Пример готовой таблицы:
+The dataframe looks like this (I have data since 2021):
 | date             | product                                                                 |   quantity |   price |   total_sum | short_date   | category   | subcategory             |
 |:-----------------|:------------------------------------------------------------------------|-----------:|--------:|------------:|:-------------|:-----------|:------------------------|
 | 2025-05-28 12:42 | сосиски куриные "суперсила", 600 г                                      |       1    |   453.6 |      453.6  | 2025-05-22   | food       | meat and sausages       |
@@ -80,7 +80,7 @@
 | 2025-05-19 19:11 | голубика, 125 г                                                         |       1    |   240   |      240    | 2025-05-17   | food       | berries                 |
 | 2025-05-19 19:11 | хлеб "на кефире с сывороткой", нарезка                                  |       1    |    87   |       87    | 2025-05-17   | food       | bread                   |
 
-Вот исходный формат данных:
+Here is the initial data format that I find in the emails:
 ``` 
  Кассовый чек 3329,61 ₽ от «АКЦИОНЕРНОЕ ОБЩЕСТВО "ВКУСВИЛЛ"» Помогаем 
 продавать 
