@@ -2,7 +2,6 @@
 Анализ расходов на продукты на основе чеков ВкусВилл <br></br>
 Арзитектура пайплайна:
 ```
-flowchart TD
   A[Gmail Inbox] --> B[Google Apps Script: Email Parser]
   B --> C[Google Sheet: Raw Emails]
   C --> D[Python Script: Regex Parser]
